@@ -1,0 +1,31 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "miro": {
+      "type": "remote",
+      "url": "https://mcp.miro.com/",
+      "enabled": true
+    },
+    "gemini-image": {
+      "type": "local",
+      "command": [
+        "node",
+        ".opencode/mcp/gemini-image-server.mjs"
+      ],
+      "enabled": true,
+      "env": {
+        "GEMINI_API_KEY": "{env:GEMINI_API_KEY}",
+        "GEMINI_IMAGE_MODEL": "{env:GEMINI_IMAGE_MODEL}",
+        "GEMINI_IMAGE_OUTPUT_DIR": ".opencode/generated-images"
+      }
+    },
+    "web-fetcher": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "mcp-server-fetch"
+      ],
+      "enabled": true
+    }
+  }
+}
