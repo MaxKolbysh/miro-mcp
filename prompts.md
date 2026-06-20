@@ -1,1 +1,4 @@
 please use engleash teacher skill and my miro board https://miro.com/app/board/uXjVHGcv8lw=/ to generate work sheet and exercises for topic Fotball Champion sheep 2026; Also generate several comic style images with geminy
+
+
+please use engleash teacher skill and my miro board https://miro.com/app/board/uXjVHGcv8lw=/ to generate work sheet and exercises about peculiarities and interesting facts about new zeland. Level C2; Also generate several images with geminy in style of lord of the rings

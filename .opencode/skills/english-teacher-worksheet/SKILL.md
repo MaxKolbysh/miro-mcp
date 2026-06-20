@@ -85,27 +85,42 @@ Create a complete Miro worksheet package with these sections unless the user ask
 
 ## Miro Image Upload Rules
 
-- For Gemini-generated images, always use the token upload flow. Do not try to place the local file directly and do not use a placeholder `image_url`.
-- Call `miro_image_get_upload_url` for each generated or local image, including the intended `title`, `x`, `y`, and `width` there. These placement values are stored with the returned token.
-- Upload bytes to the returned `upload_url` with the exact matching content type, such as `image/png` or `image/jpeg`.
-- Then call `miro_image_create` with the returned `image_token`. Set `image_url` to `null`; do not pass a string placeholder such as `":"`, `""`, or the local path.
-- When creating from an `image_token`, `title`, `x`, `y`, and `width` are ignored because they come from the token. Set them to `null` if the tool schema requires the fields.
+- Prefer the OpenCode local image upload helper when available. After Gemini generates a local file, call `miro_image_get_upload_url` with the normal placement fields plus `local_file_path` set to the generated file path. The OpenCode plugin uploads the bytes automatically and returns a short token-only response.
+- For Gemini-generated images, use the token upload flow. Do not try to place the local file directly as `image_url`.
+- Call `miro_image_get_upload_url` for each generated or local image, including the intended `title`, `x`, `y`, `width`, `content_type`, and `local_file_path`. These placement values are stored with the returned token.
+- Do not manually paste the returned presigned `upload_url` into a shell command when `local_file_path` was used; the plugin already uploaded the bytes and removed the long URL from the visible output.
+- Then call `miro_image_create` with the returned `image_token`. If the tool schema does not accept `null`, use empty strings for `image_url` and `title`, with `x: 0`, `y: 0`, and `width: 1`; the OpenCode plugin normalizes token-based image-create calls before they reach Miro.
+- When creating from an `image_token`, `title`, `x`, `y`, and `width` are ignored because they come from the token.
 - When using a public image URL directly, call `miro_image_create` with `image_url` and set `image_token` to `null`.
 - For permitted article images with a stable public URL, use `miro_image_create` with `image_url` directly. For images that require download or transformation, use the upload token flow instead.
 - Never pass both a non-null `image_token` and a non-null `image_url`.
-- After creating each image item, verify it appears on the target board or frame with `miro_board_list_items`, `miro_layout_read`, or another suitable read/list tool. If the image is missing, fix the upload/create flow before finishing.
+- After creating each image item, verify it appears on the target board or frame with `miro_layout_read`, `miro_board_list_items`, or another suitable read/list tool. `layout_read` may report images as skipped unsupported items; that is acceptable when `miro_image_create` returned success for the same frame.
 
-Example token placement after uploading a Gemini-generated image:
+Preferred local-file upload after Gemini generates an image:
+
+```json
+{
+  "miro_url": "https://miro.com/app/board/uXj...=/?moveToWidget=FRAME_ID",
+  "content_type": "image/jpeg",
+  "title": "Comic prompt: tournament fans",
+  "x": 1240,
+  "y": 690,
+  "width": 470,
+  "local_file_path": "D:\\projects\\Miro\\miro-mcp\\.opencode\\generated-images\\example.jpg"
+}
+```
+
+Then create the image from the returned token:
 
 ```json
 {
   "miro_url": "https://miro.com/app/board/uXj...=/?moveToWidget=FRAME_ID",
   "image_token": "TOKEN_FROM_IMAGE_GET_UPLOAD_URL",
-  "image_url": null,
-  "title": null,
-  "x": null,
-  "y": null,
-  "width": null
+  "image_url": "",
+  "title": "",
+  "x": 0,
+  "y": 0,
+  "width": 1
 }
 ```
 
